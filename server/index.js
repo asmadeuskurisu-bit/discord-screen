@@ -28,7 +28,12 @@ const {
 // Uma barra sobrando no fim se propaga: o shareUrl vira "//share.html" e o
 // redirect do OAuth vira "//auth/callback", que não bate com o endereço
 // cadastrado no portal. O login falha sem explicar nada.
-const PUBLIC_ORIGIN = ORIGEM_CRUA.replace(/[/]+$/, '');
+// Sem protocolo (ex.: "app.up.railway.app", como o Railway entrega), o shareUrl
+// vira um caminho relativo e a aba de compartilhar nunca abre. Assume https.
+const ORIGEM_SEM_BARRA = ORIGEM_CRUA.trim().replace(/[/]+$/, '');
+const PUBLIC_ORIGIN = /^https?:\/\//i.test(ORIGEM_SEM_BARRA)
+  ? ORIGEM_SEM_BARRA
+  : `https://${ORIGEM_SEM_BARRA}`;
 
 const isProd = NODE_ENV === 'production';
 const ADMIN_ID = String(DISCORD_ADMIN_ID).trim();
